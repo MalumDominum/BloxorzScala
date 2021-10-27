@@ -1,8 +1,5 @@
 package streams
 
-/**
- * A main object that can be used to execute the Bloxorz solver
- */
 object Bloxorz extends App {
 
   /**
@@ -16,9 +13,6 @@ object Bloxorz extends App {
 
   println(InfiniteLevel.solution)
 
-  /**
-   * A simple level constructed using the StringParserTerrain
-   */
   abstract class Level extends Solver with StringParserTerrain
 
   object Level0 extends Level {

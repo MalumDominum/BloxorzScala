@@ -27,25 +27,13 @@ trait GameDef {
    *   row axis
    */
   case class Pos(row: Int, col: Int) {
-    /** The position obtained by changing the `row` coordinate by `d` */
     def deltaRow(d: Int): Pos = copy(row = row + d)
 
-    /** The position obtained by changing the `col` coordinate by `d` */
     def deltaCol(d: Int): Pos = copy(col = col + d)
   }
 
-  /**
-   * The position where the block is located initially.
-   *
-   * This value is left abstract, it will be defined in concrete
-   * instances of the game.
-   */
   def startPos: Pos
 
-  /**
-   * The target position where the block has to go.
-   * This value is left abstract.
-   */
   def goal: Pos
 
   /**
@@ -58,12 +46,7 @@ trait GameDef {
    */
   type Terrain = Pos => Boolean
 
-
-  /**
-   * The terrain of this game. This value is left abstract.
-   */
   def terrain: Terrain
-
 
   /**
    * In Bloxorz, we can move left, right, Up or down.
@@ -79,7 +62,7 @@ trait GameDef {
    * This function returns the block at the start position of
    * the game.
    */
-  def startBlock: Block = ???
+  def startBlock: Block = Block(startPos, startPos)
 
 
   /**
@@ -106,46 +89,43 @@ trait GameDef {
 
 
     /** The block obtained by moving left */
-    def left = if (isStanding)             deltaCol(-2, -1)
-               else if (b1.row == b2.row)  deltaCol(-1, -2)
-               else                        deltaCol(-1, -1)
+    def left: Block = if (isStanding)             deltaCol(-2, -1)
+                      else if (b1.row == b2.row)  deltaCol(-1, -2)
+                      else                        deltaCol(-1, -1)
 
     /** The block obtained by moving right */
-    def right = if (isStanding)            deltaCol(1, 2)
-                else if (b1.row == b2.row) deltaCol(2, 1)
-                else                       deltaCol(1, 1)
+    def right: Block = if (isStanding)            deltaCol(1, 2)
+                       else if (b1.row == b2.row) deltaCol(2, 1)
+                       else                       deltaCol(1, 1)
 
     /** The block obtained by moving up */
-    def up = if (isStanding)               deltaRow(-2, -1)
-             else if (b1.row == b2.row)    deltaRow(-1, -1)
-             else                          deltaRow(-1, -2)
+    def up: Block = if (isStanding)               deltaRow(-2, -1)
+                    else if (b1.row == b2.row)    deltaRow(-1, -1)
+                    else                          deltaRow(-1, -2)
 
     /** The block obtained by moving down */
-    def down = if (isStanding)             deltaRow(1, 2)
-               else if (b1.row == b2.row)  deltaRow(1, 1)
-               else                        deltaRow(2, 1)
+    def down: Block = if (isStanding)             deltaRow(1, 2)
+                      else if (b1.row == b2.row)  deltaRow(1, 1)
+                      else                        deltaRow(2, 1)
 
 
     /**
      * Returns the list of blocks that can be obtained by moving
      * the current block, together with the corresponding move.
      */
-    def neighbors: List[(Block, Move)] = ???
+    def neighbors: List[(Block, Move)] = (left, Left) :: (right, Right) :: (up, Up) :: (down, Down) :: Nil
 
     /**
      * Returns the list of positions reachable from the current block
      * which are inside the terrain.
      */
-    def legalNeighbors: List[(Block, Move)] = ???
+    def legalNeighbors: List[(Block, Move)] = neighbors filter (_._1.isLegal)
 
-    /**
-     * Returns `true` if the block is standing.
-     */
-    def isStanding: Boolean = ???
+    def isStanding: Boolean = b1.row == b2.row && b1.col == b2.col
 
     /**
      * Returns `true` if the block is entirely inside the terrain.
      */
-    def isLegal: Boolean = ???
+    def isLegal: Boolean = terrain(b1) && terrain(b2)
   }
 }
