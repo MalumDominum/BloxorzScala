@@ -12,3 +12,4 @@ src_managed/
 ### Scala ###
 *.class
 *.log
+project/build.properties
