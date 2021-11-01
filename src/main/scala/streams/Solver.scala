@@ -26,13 +26,17 @@ trait Solver extends GameDef {
    * that are inside the terrain.
    */
   def neighborsWithHistory(b: Block, history: List[Move]): LazyList[(Block, List[Move])] = {
-    def neighborsInternal(neighbors: LazyList[(Block, Move)], history: List[Move]) : LazyList[(Block, List[Move])] = {
-          val block = neighbors.head._1
-          val move = neighbors.head._2
-          (block, move :: history) #:: neighborsInternal(neighbors.tail, history)
+    def neighborsInternal(neighbors: List[(Block, Move)], history: List[Move]) : LazyList[(Block, List[Move])] =
+      neighbors match {
+        case Nil => LazyList()
+        case x :: xs => {
+          val block = x._1
+          val move = x._2
+          (block, move :: history) #:: neighborsInternal(xs, history)
+        }
       }
 
-    neighborsInternal(b.legalNeighbors to LazyList, history)
+    neighborsInternal(b.legalNeighbors, history)
   }
 
   /**
@@ -100,5 +104,5 @@ trait Solver extends GameDef {
    */
   lazy val solution: List[Move] =
     if (pathsToGoal.isEmpty) List()
-    else pathsToGoal.minBy(_._2.length)._2.reverse
+    else pathsToGoal.head._2.reverse
 }
